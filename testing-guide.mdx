@@ -1,0 +1,184 @@
+---
+title: 'Testing Guide'
+description: 'Learn how to test the DCash API using the interactive playground'
+---
+
+## API Playground
+
+All API endpoints in this documentation include an interactive playground that allows you to test requests directly from your browser.
+
+## Setup Your API Key
+
+Before testing, you need to configure your authentication:
+
+<Steps>
+  <Step title="Get Your Merchant API Key">
+    Contact DCash support or log into your merchant dashboard to obtain your API key
+  </Step>
+  <Step title="Configure the Playground">
+    Click the "Authorization" button in the playground and enter your API key in the `x-api-key` field
+  </Step>
+  <Step title="Add User Token (if needed)">
+    For endpoints requiring user authentication, add the Bearer token in the `Authorization` header
+  </Step>
+</Steps>
+
+## Test Credentials
+
+For sandbox testing, use these credentials:
+
+<CodeGroup>
+
+```json Test User
+{
+  "email": "peter.m.kayere@gmail.com",
+  "password": "7223acsd"
+}
+```
+
+</CodeGroup>
+
+## Testing Different Endpoints
+
+### OAuth Login (Browser-based)
+
+<Warning>
+  The OAuth endpoint returns HTML and cannot be tested in the API playground.
+</Warning>
+
+To test the OAuth flow:
+
+1. Construct the URL manually:
+   ```
+   https://sandbox.dcash.africa/oauth/authorization/login?app_id=YOUR_APP_ID&redirect_url=YOUR_REDIRECT_URL
+   ```
+2. Replace `YOUR_APP_ID` with your actual app ID
+3. Set a valid `redirect_url` for your application
+4. Open the URL in your browser
+5. Log in with the test credentials
+6. Complete the authentication flow
+7. Your webhook will receive the authorization token
+
+### Get Payment Providers
+
+<Steps>
+  <Step title="Set Authentication">
+    Add both `x-api-key` (merchant key) and `Authorization` (Bearer token)
+  </Step>
+  <Step title="Send Request">
+    Click the "Send" button to get the user's available payment providers
+  </Step>
+</Steps>
+
+### Deposits (C2B)
+
+<Steps>
+  <Step title="Configure Headers">
+    - `x-api-key`: Your merchant API key
+    - `Authorization`: Bearer token from OAuth flow
+  </Step>
+  <Step title="Fill Request Body">
+    ```json
+    {
+      "reference_id": "test_001",
+      "description": "Test Deposit",
+      "payment_provider": "mpesa",
+      "amount": 10,
+      "currency": "USD",
+      "webhook_url": "https://your-webhook-url.com/webhook"
+    }
+    ```
+  </Step>
+  <Step title="Send Request">
+    Click "Send" to initiate the deposit
+  </Step>
+  <Step title="Complete Payment">
+    Check your phone for the M-Pesa prompt and complete the payment
+  </Step>
+</Steps>
+
+### Check Transaction Status
+
+<Steps>
+  <Step title="Get Transaction ID">
+    Use the `transaction_id` from a previous deposit or withdrawal
+  </Step>
+  <Step title="Add API Key">
+    Only `x-api-key` is required (no user token needed)
+  </Step>
+  <Step title="Send Request">
+    Click "Send" to check the status
+  </Step>
+</Steps>
+
+### Withdrawals (B2C)
+
+<Steps>
+  <Step title="Configure Authentication">
+    Add your `x-api-key` in the authorization section
+  </Step>
+  <Step title="Fill Request Body">
+    ```json
+    {
+      "reference_id": "withdrawal_001",
+      "description": "Test Withdrawal",
+      "payment_provider": "mpesa",
+      "email": "user@example.com",
+      "amount": 10,
+      "currency": "USD"
+    }
+    ```
+  </Step>
+  <Step title="Send Request">
+    The withdrawal will be processed immediately
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Invalid URL Error">
+    Make sure the base URL is configured correctly in the API settings. The base URL should be `https://sandbox.dcash.africa`
+  </Accordion>
+
+  <Accordion title="401 Unauthorized">
+    - Check that your API key is correct
+    - Verify the `x-api-key` header is set
+    - For user-specific endpoints, ensure you have a valid Bearer token
+  </Accordion>
+
+  <Accordion title="400 Bad Request">
+    - Verify all required fields are included in the request body
+    - Check that the `payment_provider` is from the list of available providers
+    - Ensure amounts are valid numbers
+  </Accordion>
+
+  <Accordion title="Webhook Not Received">
+    - Verify your webhook URL is publicly accessible
+    - Use the "Check Transaction Status" endpoint to verify the transaction completed
+    - Check your webhook server logs for incoming requests
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Valid Webhooks" icon="webhook">
+    Always use a real, publicly accessible webhook URL for testing deposits
+  </Card>
+  <Card title="Test Small Amounts" icon="coins">
+    Start with small amounts (e.g., 10 USD) when testing
+  </Card>
+  <Card title="Save Tokens" icon="key">
+    Store your test Bearer tokens for reuse during testing
+  </Card>
+  <Card title="Check Providers First" icon="list">
+    Always call "Get Payment Providers" before initiating transactions
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Check>
+  Ready to integrate? Check out the [Authentication](/authentication) guide to get started with your application.
+</Check>

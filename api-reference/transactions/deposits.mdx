@@ -1,0 +1,251 @@
+---
+title: 'Deposits (C2B)'
+api: 'POST /merchants/transactions/c2b'
+description: 'Initiate a customer-to-business deposit transaction'
+---
+
+## Endpoint
+
+```
+POST /merchants/transactions/c2b
+```
+
+## Description
+
+Initiates a fund transfer on behalf of the user. The transaction flow works as follows:
+
+<Steps>
+  <Step title="Check Balance">
+    System checks if the user's DCash balance is sufficient
+  </Step>
+  <Step title="Initiate Deposit">
+    If insufficient, a deposit transaction is initiated with the specified payment provider
+  </Step>
+  <Step title="Transfer Funds">
+    Once the deposit succeeds, funds are transferred to the merchant account
+  </Step>
+  <Step title="Webhook Notification">
+    The provided webhook is called with transaction details
+  </Step>
+</Steps>
+
+<Info>
+  If the webhook is not triggered, use the [Check Transaction Status](/api-reference/transactions/check-status) endpoint to verify the transaction status.
+</Info>
+
+## Headers
+
+<ParamField header="x-api-key" type="string" required>
+  Merchant API key for authentication
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token of the authenticated user
+
+  Format: `Bearer {token}`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="reference_id" type="string">
+  Merchant-provided unique identifier for tracking
+</ParamField>
+
+<ParamField body="description" type="string">
+  Description of the deposit transaction
+</ParamField>
+
+<ParamField body="payment_provider" type="string" required>
+  Payment provider to use (e.g., "mpesa", "airtel")
+
+  Must be one of the providers returned by the [Get Payment Providers](/api-reference/user-management/get-providers) endpoint
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Amount to deposit
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Currency code (e.g., "USD")
+</ParamField>
+
+<ParamField body="webhook_url" type="string" required>
+  URL to receive transaction completion notification
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string">
+  Unique identifier for the transaction
+</ResponseField>
+
+<ResponseField name="reference_id" type="string">
+  Merchant-provided reference ID (if provided)
+</ResponseField>
+
+<ResponseField name="transaction_status" type="string">
+  Current status of the transaction (e.g., "pending")
+</ResponseField>
+
+## Webhook Response
+
+When the transaction completes, your webhook will receive:
+
+<ResponseField name="transaction_id" type="string">
+  Unique identifier for the transaction
+</ResponseField>
+
+<ResponseField name="reference_id" type="string">
+  Merchant-provided reference ID (if provided)
+</ResponseField>
+
+<ResponseField name="transaction_status" type="string">
+  Status of the transaction (e.g., "completed")
+</ResponseField>
+
+<ResponseField name="user_email" type="string">
+  Email of the user who made the deposit
+</ResponseField>
+
+<ResponseField name="amount" type="number">
+  Amount deposited
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Currency code
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Description of the transaction
+</ResponseField>
+
+<ResponseField name="date_completed" type="number">
+  Timestamp of completion (format: YYYYMMDDHHMMSS)
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://sandbox.dcash.africa/merchants/transactions/c2b \
+  --header 'Authorization: Bearer YOUR_USER_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: YOUR_MERCHANT_API_KEY' \
+  --data '{
+    "reference_id": "abcd",
+    "description": "Test Deposit",
+    "payment_provider": "mpesa",
+    "amount": 10,
+    "currency": "USD",
+    "webhook_url": "https://api.paymaxis.com/webhook/dcash"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://sandbox.dcash.africa/merchants/transactions/c2b', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_MERCHANT_API_KEY',
+    'Authorization': 'Bearer YOUR_USER_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    reference_id: 'abcd',
+    description: 'Test Deposit',
+    payment_provider: 'mpesa',
+    amount: 10,
+    currency: 'USD',
+    webhook_url: 'https://api.paymaxis.com/webhook/dcash'
+  })
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+url = "https://sandbox.dcash.africa/merchants/transactions/c2b"
+headers = {
+    "x-api-key": "YOUR_MERCHANT_API_KEY",
+    "Authorization": "Bearer YOUR_USER_TOKEN",
+    "Content-Type": "application/json"
+}
+payload = {
+    "reference_id": "abcd",
+    "description": "Test Deposit",
+    "payment_provider": "mpesa",
+    "amount": 10,
+    "currency": "USD",
+    "webhook_url": "https://api.paymaxis.com/webhook/dcash"
+}
+
+response = requests.post(url, headers=headers, json=payload)
+data = response.json()
+print(data)
+```
+
+```php PHP
+<?php
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, "https://sandbox.dcash.africa/merchants/transactions/c2b");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "x-api-key: YOUR_MERCHANT_API_KEY",
+    "Authorization: Bearer YOUR_USER_TOKEN",
+    "Content-Type: application/json"
+]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+    "reference_id" => "abcd",
+    "description" => "Test Deposit",
+    "payment_provider" => "mpesa",
+    "amount" => 10,
+    "currency" => "USD",
+    "webhook_url" => "https://api.paymaxis.com/webhook/dcash"
+]));
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+print_r($data);
+?>
+```
+
+</CodeGroup>
+
+## Example Response
+
+<CodeGroup>
+
+```json Initial Response
+{
+  "transaction_id": "skjr3",
+  "reference_id": "abcd",
+  "transaction_status": "pending"
+}
+```
+
+```json Webhook Payload
+{
+  "transaction_id": "skjr3",
+  "reference_id": "abcd",
+  "transaction_status": "completed",
+  "user_email": "peter.m.kayere@gmail.com",
+  "amount": 10,
+  "currency": "USD",
+  "description": "Test Deposit",
+  "date_completed": 20241214125109
+}
+```
+
+</CodeGroup>
+
+<Check>
+  When you receive a "completed" status in your webhook, the funds have been successfully transferred to your merchant account.
+</Check>

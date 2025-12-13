@@ -1,0 +1,97 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "DCash API Documentation",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#4f46e5",
+    "light": "#6366f1",
+    "dark": "#4f46e5",
+    "anchors": {
+      "from": "#4f46e5",
+      "to": "#6366f1"
+    },
+    "background": {
+      "light": "#FFFFFF",
+      "dark": "#09090b"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:support@dcash.africa"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Dashboard",
+    "url": "https://merchants.dcash.africa"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Blog",
+      "icon": "newspaper",
+      "url": "https://blog.dcash.africa"
+    },
+    {
+      "name": "Website",
+      "icon": "globe",
+      "url": "https://dcash.africa"
+    },
+    {
+      "name": "Support",
+      "icon": "headset",
+      "url": "mailto:support@dcash.africa"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": ["introduction", "authentication", "testing-guide"]
+    },
+    {
+      "group": "User Management",
+      "pages": [
+        "api-reference/user-management/oauth-login",
+        "api-reference/user-management/get-providers"
+      ]
+    },
+    {
+      "group": "Transactions",
+      "pages": [
+        "api-reference/transactions/deposits",
+        "api-reference/transactions/check-status",
+        "api-reference/transactions/withdrawals"
+      ]
+    }
+  ],
+  "feedback": {
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "footerSocials": {
+    "x": "https://x.com/DCash_Africa",
+    "facebook": "https://facebook.com/61571545778453/",
+    "instagram": "https://www.instagram.com/dcash_africa"
+  },
+  "api": {
+    "baseUrl": "https://sandbox.dcash.africa",
+    "auth": {
+      "method": "key",
+      "name": "x-api-key",
+      "inputPrefix": ""
+    },
+    "playground": {
+      "mode": "show"
+    },
+    "maintainOrder": true
+  }
+}

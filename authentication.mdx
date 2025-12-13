@@ -1,0 +1,78 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate your API requests'
+---
+
+## Authentication Overview
+
+The DCash API uses a two-level authentication system to ensure secure access:
+
+<Steps>
+  <Step title="Merchant Authentication">
+    API requests are authenticated using your merchant API key via the `x-api-key` header
+  </Step>
+  <Step title="User Authentication">
+    For user-specific operations, a user token is required via the `Authorization` header with the format `Bearer {token}`
+  </Step>
+</Steps>
+
+## How It Works
+
+Tokens are obtained through the OAuth authorization flow. Here's the complete process:
+
+<Steps>
+  <Step title="Initiate OAuth Flow">
+    Your application redirects the user to the DCash authorization endpoint
+  </Step>
+  <Step title="User Authenticates">
+    User logs in with their DCash credentials and approves access permissions
+  </Step>
+  <Step title="Receive Token">
+    Upon successful authentication, DCash sends an authorization token to your pre-registered webhook endpoint
+  </Step>
+  <Step title="User Redirected">
+    The user is redirected back to your specified redirect URL
+  </Step>
+</Steps>
+
+## Authorization Headers
+
+### Merchant API Key
+
+Include your merchant API key in all requests:
+
+```bash
+x-api-key: YOUR_MERCHANT_API_KEY
+```
+
+### User Token
+
+For user-specific operations, include the user's authorization token:
+
+```bash
+Authorization: Bearer {user_token}
+```
+
+## Token Management
+
+<Warning>
+  Tokens are sensitive credentials. Follow these best practices:
+</Warning>
+
+- **Store securely**: Use appropriate encryption when storing tokens
+- **Use HTTPS**: Always use HTTPS for redirect URLs
+- **Validate redirects**: Ensure redirect URLs match your expected domain
+- **Handle revocation**: Users can revoke tokens through the DCash app or website
+- **Re-authenticate**: If a token becomes invalid, repeat the authorization flow
+
+## Getting Started
+
+To implement authentication in your application:
+
+1. Register your application to receive your merchant API key
+2. Configure your webhook URL in your merchant account settings
+3. Implement the OAuth flow using the [Authentication endpoint](/api-reference/user-management/oauth-login)
+
+<Check>
+  Ready to implement? Check out the [OAuth Login](/api-reference/user-management/oauth-login) endpoint documentation.
+</Check>

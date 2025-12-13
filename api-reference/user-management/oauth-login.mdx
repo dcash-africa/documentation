@@ -1,0 +1,149 @@
+---
+title: 'OAuth Login'
+description: 'Initiate OAuth 2.0 authorization flow for user authentication'
+---
+
+<Warning>
+  This endpoint returns HTML and requires browser interaction. It cannot be tested via the API playground. Use the example code below to redirect users to this page.
+</Warning>
+
+## Endpoint
+
+```
+GET /oauth/authorization/login
+```
+
+<Info>
+  This is a browser redirect endpoint. When accessed, it displays a login page for users to authenticate with their DCash credentials.
+</Info>
+
+## Query Parameters
+
+<ParamField query="app_id" type="string" required>
+  Your application's unique identifier provided during registration
+</ParamField>
+
+<ParamField query="redirect_url" type="string" required>
+  The URL where users will be redirected after authentication
+</ParamField>
+
+## How It Works
+
+This endpoint initiates the OAuth 2.0 authorization flow:
+
+<Steps>
+  <Step title="Redirect User">
+    Your application redirects the user to this DCash URL
+  </Step>
+  <Step title="User Authenticates">
+    User authenticates with their DCash credentials and approves access permissions
+  </Step>
+  <Step title="Token Sent to Webhook">
+    Upon successful authentication, DCash sends an authorization token to your pre-registered webhook endpoint
+  </Step>
+  <Step title="User Redirected">
+    The user is redirected to your specified `redirect_url`
+  </Step>
+</Steps>
+
+## Authorization Token
+
+<Info>
+  The token will be sent to the webhook URL configured in your merchant account settings.
+</Info>
+
+**Important Notes:**
+- Store this token securely - it's required for making API calls on behalf of the user
+- Tokens may be revoked by users through the DCash app or website
+- If a token becomes invalid, you'll need to repeat the authorization flow
+
+## Security Recommendations
+
+<Warning>
+  Follow these security best practices when implementing OAuth:
+</Warning>
+
+- Always validate that redirect URLs match your expected domain
+- Use HTTPS for all redirect URLs
+- Store tokens securely using appropriate encryption
+
+## Webhook Response
+
+When authentication is successful, your webhook will receive the following payload:
+
+### Webhook Parameters
+
+<ResponseField name="event" type="string">
+  Type of event triggered (e.g., "user_authorized")
+</ResponseField>
+
+<ResponseField name="user_email" type="string">
+  Email address of the authenticated user
+</ResponseField>
+
+<ResponseField name="token" type="string">
+  DCash token for subsequent API requests
+</ResponseField>
+
+### Example Webhook Payload
+
+<CodeGroup>
+
+```json Response
+{
+  "event": "user_authorized",
+  "user_email": "peter.m.kayere@gmail.com",
+  "token": "dcash_token_example"
+}
+```
+
+</CodeGroup>
+
+## Example Implementation
+
+Here's how to redirect a user to initiate the OAuth flow:
+
+<CodeGroup>
+
+```javascript JavaScript
+const appId = 'YOUR_APP_ID';
+const redirectUrl = 'https://yourapp.com/callback';
+
+// Redirect user to DCash OAuth endpoint
+window.location.href = `https://sandbox.dcash.africa/oauth/authorization/login?app_id=${appId}&redirect_url=${encodeURIComponent(redirectUrl)}`;
+```
+
+```python Python
+import urllib.parse
+
+app_id = 'YOUR_APP_ID'
+redirect_url = 'https://yourapp.com/callback'
+
+# Construct OAuth URL
+oauth_url = f"https://sandbox.dcash.africa/oauth/authorization/login?app_id={app_id}&redirect_url={urllib.parse.quote(redirect_url)}"
+
+# Redirect user (implementation depends on your framework)
+```
+
+```php PHP
+<?php
+$appId = 'YOUR_APP_ID';
+$redirectUrl = 'https://yourapp.com/callback';
+
+// Construct OAuth URL
+$oauthUrl = "https://sandbox.dcash.africa/oauth/authorization/login?app_id=" .
+            $appId .
+            "&redirect_url=" .
+            urlencode($redirectUrl);
+
+// Redirect user
+header("Location: " . $oauthUrl);
+exit();
+?>
+```
+
+</CodeGroup>
+
+<Check>
+  After receiving the token via webhook, you can use it to make authenticated API requests on behalf of the user.
+</Check>

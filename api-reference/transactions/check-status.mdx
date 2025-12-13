@@ -1,0 +1,163 @@
+---
+title: 'Check Transaction Status'
+api: 'GET /merchant/transactions/status/{transaction_id}'
+description: 'Retrieve the current status of a transaction'
+---
+
+## Endpoint
+
+```
+GET /merchant/transactions/status/{transaction_id}
+```
+
+## Description
+
+Retrieves the current status of the specified transaction. This endpoint is useful when:
+
+- Your webhook notification was not received
+- You need to verify a transaction's current state
+- You want to poll for transaction completion
+- You need to reconcile transactions
+
+## Headers
+
+<ParamField header="x-api-key" type="string" required>
+  Merchant API key for authentication
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="transaction_id" type="string" required>
+  ID of the transaction to check status
+
+  This is the `transaction_id` returned when the transaction was initiated
+</ParamField>
+
+## Response
+
+<ResponseField name="transaction_id" type="string">
+  Unique identifier for the transaction
+</ResponseField>
+
+<ResponseField name="reference_id" type="string">
+  Merchant-provided reference ID (if provided during transaction creation)
+</ResponseField>
+
+<ResponseField name="transaction_status" type="string">
+  Current status of the transaction
+
+  Possible values:
+  - `pending` - Transaction is being processed
+  - `completed` - Transaction completed successfully
+  - `failed` - Transaction failed
+</ResponseField>
+
+## Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl --request GET \
+  --url https://sandbox.dcash.africa/merchant/transactions/status/skjr3 \
+  --header 'x-api-key: YOUR_MERCHANT_API_KEY'
+```
+
+```javascript JavaScript
+const transactionId = 'skjr3';
+
+const response = await fetch(`https://sandbox.dcash.africa/merchant/transactions/status/${transactionId}`, {
+  method: 'GET',
+  headers: {
+    'x-api-key': 'YOUR_MERCHANT_API_KEY'
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+transaction_id = "skjr3"
+url = f"https://sandbox.dcash.africa/merchant/transactions/status/{transaction_id}"
+headers = {
+    "x-api-key": "YOUR_MERCHANT_API_KEY"
+}
+
+response = requests.get(url, headers=headers)
+data = response.json()
+print(data)
+```
+
+```php PHP
+<?php
+$transactionId = "skjr3";
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, "https://sandbox.dcash.africa/merchant/transactions/status/" . $transactionId);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "x-api-key: YOUR_MERCHANT_API_KEY"
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+print_r($data);
+?>
+```
+
+</CodeGroup>
+
+## Example Response
+
+<CodeGroup>
+
+```json Pending
+{
+  "transaction_id": "skjr3",
+  "reference_id": "abcd",
+  "transaction_status": "pending"
+}
+```
+
+```json Completed
+{
+  "transaction_id": "skjr3",
+  "reference_id": "abcd",
+  "transaction_status": "completed"
+}
+```
+
+```json Failed
+{
+  "transaction_id": "skjr3",
+  "reference_id": "abcd",
+  "transaction_status": "failed"
+}
+```
+
+</CodeGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Polling Strategy" icon="clock">
+    If polling for status, use exponential backoff to avoid overwhelming the API
+  </Card>
+  <Card title="Webhook First" icon="webhook">
+    Always implement webhooks as the primary notification method. Use this endpoint as a fallback
+  </Card>
+  <Card title="Reference IDs" icon="tag">
+    Use reference_id to match transactions to your internal systems
+  </Card>
+  <Card title="Error Handling" icon="shield-check">
+    Handle all three status states (pending, completed, failed) appropriately
+  </Card>
+</CardGroup>
+
+<Note>
+  This endpoint does not require user authentication (no Authorization header), only your merchant API key.
+</Note>

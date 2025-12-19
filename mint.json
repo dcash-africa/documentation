@@ -29,12 +29,6 @@
     "name": "Dashboard",
     "url": "https://merchants.dcash.africa"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
   "anchors": [
     {
       "name": "Blog",
